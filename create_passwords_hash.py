@@ -20,6 +20,7 @@ parser.add_argument('-p', '--password', dest='password', help='The password to h
 parser.add_argument('-P', '--password-prompt', dest='password', action=PasswordPrompt, type=str, nargs=0, help='Prompt for the password to hash')
 parser.add_argument('-s', '--strength', type=int, help='Number of hashing rounds to create password hash.')
 parser.add_argument('-v', '--verify', type=str, help='Verify with the provided hash.')
+parser.add_argument('-a', '--algorithm', type=str, default='2b', help='Specifies which version of the BCrypt algorithm will be used.')
 args = parser.parse_args()
 
 if not args.password:
@@ -43,11 +44,11 @@ if args.verify:
 else:
     if args.strength is not None:
         try:
-            bhash = bcrypt.encrypt(password, rounds=args.strength)
+            bhash = bcrypt.hash(password, ident=args.algorithm, rounds=args.strength)
         except Exception as e:
             print('Error: %s' % e, file=sys.stderr)
             sys.exit(1)
     else:
-        bhash = bcrypt.encrypt(password)
+        bhash = bcrypt.hash(password, ident=args.algorithm)
     print(bhash, end='', flush=True)
     print(file=sys.stderr)
